@@ -56,4 +56,6 @@ private[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
 
 object BankInfoRepository extends BankInfoRepository with PostgresDBComponent
 
-case class BankInfo(owner: String, branches: Int, bankId: Int, id: Option[Int] = None)
+case class BankInfo(owner: String, branches: Int, bankId: Int, id: Option[Int] = None) {
+  override def toString = s"""BankInfo for $owner; bankId #$bankId; $branches branches."""
+}

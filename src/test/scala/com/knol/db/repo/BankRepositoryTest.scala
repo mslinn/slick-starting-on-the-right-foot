@@ -15,8 +15,8 @@ class BankRepositoryTest extends FunSuite with BankRepository with H2DBComponent
   }
 
   test("Update  SBI bank  ") {
-    whenReady(update(Bank("SBI Bank", Some(1)))) { response =>
-      assert(response === 1)
+    whenReady(update(Bank("SBI Bank", Some(1)))) { bankId =>
+      assert(bankId === 1)
     }
   }
 

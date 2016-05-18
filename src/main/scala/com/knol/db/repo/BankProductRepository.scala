@@ -57,4 +57,6 @@ private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
 
 object BankProductRepository extends BankProductRepository with PostgresDBComponent
 
-case class BankProduct(name: String, bankId: Int, id: Option[Int] = None)
+case class BankProduct(name: String, bankId: Int, id: Option[Int] = None) {
+  override def toString = s"Product $name #$bankId"
+}

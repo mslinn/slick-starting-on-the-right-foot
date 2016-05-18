@@ -1,0 +1,63 @@
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection ..................................
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection ..................................
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection ..................................
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection ..................................
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection ..................................
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection ..................................
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection ..................................
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection ..................................
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection ..................................
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection ..................................
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection ..................................
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection ..................................
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection ..................................
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection ..................................
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection ..................................
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection ..................................
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection ..................................
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection ..................................
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection
+INFO  com.knol.db.repo.BankRepositoryTest - Creating test connection
+INFO  c.k.d.repo.BankProductRepositoryTest - Creating test connection
+INFO  c.k.db.repo.BankInfoRepositoryTest - Creating test connection
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
+INFO  com.zaxxer.hikari.HikariDataSource - HikariCP pool postgres is starting.
