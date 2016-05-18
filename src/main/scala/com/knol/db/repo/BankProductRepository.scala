@@ -34,7 +34,6 @@ trait BankProductRepository extends BankProductTable { this: DBComponent =>
     db.run {
       bankTableQuery.joinLeft(bankProductTableQuery).on(_.id === _.bankId).to[List].result
     }
-
 }
 
 private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
@@ -46,13 +45,11 @@ private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
     val bankId = column[Int]("bank_id")
     def bank   = foreignKey("bank_product_fk", bankId, bankTableQuery)(_.id)
     def * = (name, bankId, id.?) <> (BankProduct.tupled, BankProduct.unapply)
-
   }
 
   protected val bankProductTableQuery = TableQuery[BankProductTable]
 
   protected def bankProductTableAutoInc = bankProductTableQuery returning bankProductTableQuery.map(_.id)
-
 }
 
 object BankProductRepository extends BankProductRepository with PostgresDBComponent

@@ -46,7 +46,6 @@ private[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
     val branches = column[Int]("branches")
     def bank = foreignKey("bank_product_fk", bankId, bankTableQuery)(_.id)
     def * = (owner, branches, bankId, id.?) <> (BankInfo.tupled, BankInfo.unapply)
-
   }
 
   protected val bankInfoTableQuery = TableQuery[BankInfoTable]
