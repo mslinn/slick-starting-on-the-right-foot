@@ -1,8 +1,7 @@
 package com.knol.db.repo
 
-import com.knol.db.connection.DBComponent
+import com.knol.db.connection.{DBComponent, MySqlDBComponent, PostgresDBComponent}
 import scala.concurrent.Future
-import com.knol.db.connection.MySqlDBComponent
 
 trait BankRepository extends BankTable { this: DBComponent =>
 
@@ -57,6 +56,6 @@ private[repo] trait BankTable { this: DBComponent =>
 
 }
 
-object BankRepository extends BankRepository with MySqlDBComponent
+object BankRepository extends BankRepository with PostgresDBComponent
 
 case class Bank(name: String, id: Option[Int] = None)
