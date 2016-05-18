@@ -4,7 +4,6 @@ import com.knol.db.connection.{DBComponent, MySqlDBComponent, PostgresDBComponen
 import scala.concurrent.Future
 
 trait BankRepository extends BankTable { this: DBComponent =>
-
   import driver.api._
 
   /**
@@ -29,7 +28,7 @@ trait BankRepository extends BankTable { this: DBComponent =>
    * @return
    * Get all banks
    */
-  def getAll(): Future[List[Bank]] = db.run { bankTableQuery.to[List].result }
+  def getAll: Future[List[Bank]] = db.run { bankTableQuery.to[List].result }
 
   /**
    * @param id
@@ -40,14 +39,12 @@ trait BankRepository extends BankTable { this: DBComponent =>
 }
 
 private[repo] trait BankTable { this: DBComponent =>
-
   import driver.api._
 
   private[BankTable] class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
     val id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     val name = column[String]("name")
     def * = (name, id.?) <> (Bank.tupled, Bank.unapply)
-
   }
 
   protected val bankTableQuery = TableQuery[BankTable]

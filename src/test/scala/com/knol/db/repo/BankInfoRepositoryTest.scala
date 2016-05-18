@@ -36,21 +36,21 @@ class BankInfoRepositoryTest extends FunSuite with BankInfoRepository with H2DBC
   }
 
   test("Get bank info list") {
-    val bankInfo = getAll()
+    val bankInfo = getAll
     whenReady(bankInfo) { result =>
       assert(result === List(BankInfo("goverment", 10000, 1, Some(1))))
     }
   }
 
   test("Get bank and their info list") {
-    val bankInfo = getBankWithInfo()
+    val bankInfo = getBankWithInfo
     whenReady(bankInfo) { result =>
       assert(result === List((Bank("SBI bank", Some(1)), BankInfo("goverment", 10000, 1, Some(1)))))
     }
   }
 
   test("Get all bank and  info list") {
-    val bankInfo = getAllBankWithInfo()
+    val bankInfo = getAllBankWithInfo
     whenReady(bankInfo) { result =>
       assert(result === List((Bank("SBI bank", Some(1)), Some(BankInfo("goverment", 10000, 1, Some(1)))), (Bank("PNB bank", Some(2)), None)))
     }

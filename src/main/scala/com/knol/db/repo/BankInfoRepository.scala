@@ -19,7 +19,7 @@ trait BankInfoRepository extends BankInfoTable { this: DBComponent =>
   /**
    * Get bank and info using foreign key relationship
    */
-  def getBankWithInfo(): Future[List[(Bank, BankInfo)]] =
+  def getBankWithInfo: Future[List[(Bank, BankInfo)]] =
     db.run {
       (for {
         info <- bankInfoTableQuery
@@ -30,7 +30,7 @@ trait BankInfoRepository extends BankInfoTable { this: DBComponent =>
   /**
    * Get all bank and their info.It is possible some bank do not have their product
    */
-  def getAllBankWithInfo(): Future[List[(Bank, Option[BankInfo])]] =
+  def getAllBankWithInfo: Future[List[(Bank, Option[BankInfo])]] =
     db.run {
       bankTableQuery.joinLeft(bankInfoTableQuery).on(_.id === _.bankId).to[List].result
     }

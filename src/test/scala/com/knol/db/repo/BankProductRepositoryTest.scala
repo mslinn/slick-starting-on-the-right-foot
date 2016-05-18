@@ -36,21 +36,21 @@ class BankProductRepositoryTest extends FunSuite with BankProductRepository with
   }
 
   test("Get product list") {
-    val products = getAll()
+    val products = getAll
     whenReady(products) { result =>
       assert(result === List(BankProduct("home loan", 1, Some(1)), BankProduct("eduction loan", 1, Some(2))))
     }
   }
 
   test("Get bank and their product list") {
-    val bankProduct = getBankWithProduct()
+    val bankProduct = getBankWithProduct
     whenReady(bankProduct) { result =>
       assert(result === List((Bank("SBI bank", Some(1)), BankProduct("home loan", 1, Some(1))), (Bank("SBI bank", Some(1)), BankProduct("eduction loan", 1, Some(2)))))
     }
   }
 
   test("Get all bank and  product list") {
-    val bankProduct = getAllBankWithProduct()
+    val bankProduct = getAllBankWithProduct
     whenReady(bankProduct) { result =>
       assert(result === List((Bank("SBI bank", Some(1)), Some(BankProduct("home loan", 1, Some(1)))), (Bank("SBI bank", Some(1)), Some(BankProduct("eduction loan", 1, Some(2)))), (Bank("PNB bank", Some(2)), None)))
     }
