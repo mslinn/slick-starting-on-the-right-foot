@@ -1,9 +1,9 @@
 package com.knol.db.repo
 
 import com.knol.db.connection._
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
-private[repo] trait BankTable { this: DBComponent =>
+protected[repo] trait BankTable { this: DBComponent =>
   import driver.api._
 
   private[BankTable] class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
@@ -17,8 +17,13 @@ private[repo] trait BankTable { this: DBComponent =>
   protected def bankTableAutoInc = bankTableQuery returning bankTableQuery.map(_.id)
 }
 
-trait BankRepository extends BankTable { this: DBComponent =>
-  import driver.api._
+protected[repo] trait BankRepository extends BankTable { this: DBComponent =>
+  import concurrent.duration.Duration
+  import slick.driver.PostgresDriver.api._
+
+  // Cannot be a val because the query has not initialized yet when the trait constructor runs
+  def schemaDDL = bankTableQuery.schema.create.statements
+  def makeSchema = Await.result(db.run(bankTableQuery.schema.create), Duration.Inf)
 
   /** create new bank */
   def create(bank: Bank): Future[Int] = db.run { bankTableAutoInc += bank }
@@ -36,7 +41,9 @@ trait BankRepository extends BankTable { this: DBComponent =>
   def delete(id: Int): Future[Int] = db.run { bankTableQuery.filter(_.id === id).delete }
 }
 
-object BankRepository extends BankRepository with PostgresDBComponent
+object BankRepository extends BankRepository with PostgresDBComponent {
+  //println(schemaDDL.mkString("\n"))
+}
 
 case class Bank(name: String, id: Option[Int] = None) {
   override def toString = s"""Bank $name ${ id.map(x => s"id #$x").mkString }"""
