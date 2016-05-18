@@ -11,11 +11,11 @@ object Demo extends App {
       BankInfoRepository.create(BankInfo("Goverment", 1000, id))
       BankRepository.create(Bank("SBI Bank"))
 
-    case _ =>
-      println("Error ...........")
+    case Failure(e) =>
+      println(s"Error ${e.getCause}: ${e.getMessage}")
   }
 
   BankInfoRepository.getAllBankWithInfo().foreach(println)
-  BankProductRepository.getAllBankWithProduct().foreach(println)
+  BankProductRepository.getAllBankWithProduct.foreach(println)
   Thread.sleep(10 * 1000)
 }
