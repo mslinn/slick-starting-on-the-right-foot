@@ -3,7 +3,7 @@
 
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%highlight([%level]) - [%date] - [%logger]  %msg%n</pattern>
+			<pattern>%highlight([%level]) - [%logger] %msg%n</pattern>
 		</encoder>
 	</appender>
 	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -13,7 +13,7 @@
 		</rollingPolicy>
 		<append>true</append>
 		<encoder>
-			<pattern>%highlight([%level]) - [%date] - [%logger]  %msg%n</pattern>
+			<pattern>%highlight([%level]) - [%logger] %msg%n</pattern>
 		</encoder>
 	</appender>
 	<root level="info">
