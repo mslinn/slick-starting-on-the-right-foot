@@ -1,23 +1,35 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>application.log</file>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
 
-	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>%highlight([%level]) - [%date] - [%logger]  %msg%n</pattern>
-		</encoder>
-	</appender>
-	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<prudent>true</prudent>
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-		<fileNamePattern>log-%d{yyyy-MM-dd}.log</fileNamePattern>
-		</rollingPolicy>
-		<append>true</append>
-		<encoder>
-			<pattern>%highlight([%level]) - [%date] - [%logger]  %msg%n</pattern>
-		</encoder>
-	</appender>
-	<root level="info">
-		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="FILE" />
-	</root>
-</configuration> 
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- # level of
+       # request         effective level q
+       #         TRACE  DEBUG INFO  WARN  ERROR OFF
+       # TRACE    YES   NO    NO    NO    NO    NO
+       # DEBUG    YES   YES   NO    NO    NO    NO
+       # INFO     YES   YES   YES   NO    NO    NO
+       # WARN     YES   YES   YES   YES   NO    NO
+       # ERROR    YES   YES   YES   YES   YES   NO
+       # See http://logback.qos.ch/manual/architecture.html
+
+       For example, if a logger is set to DEBUG, then the following produces output:
+       Logger.info, Logger.debug, Logger.warn
+
+       CAUTION: If you specify WARNING instead of WARN then the value DEBUG is used!!!! -->
+  <logger name="db" level="${DATABASE_DEBUG:-INFO}" />
+
+  <root level="info">
+    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
+  </root>
+</configuration>

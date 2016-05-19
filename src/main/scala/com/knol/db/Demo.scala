@@ -1,26 +1,29 @@
 package com.knol.db
 
 import com.knol.db.repo._
-import scala.util._
+import concurrent.duration.Duration
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util._
 
 object Demo extends App {
-
-  val bankId = BankRepository.create(Bank("ICICI bank"))
-
-  bankId.onComplete {
+  BankRepository.create(Bank("ICICI bank")) onComplete {
     case Success(id) =>
-
-      BankProductRepository.create(BankProduct("car loan", id))
-      BankInfoRepository.create(BankInfo("Goverment", 1000, id))
+      BankProductRepository.create(BankProduct("Car loan", id))
+      BankInfoRepository.create(BankInfo("Government", 1000, id))
       BankRepository.create(Bank("SBI Bank"))
-    case _ => println("Error ...........")
+
+    case Failure(e) =>
+      println(s"Error ${ e.getCause }: ${ e.getMessage }")
   }
 
-  BankInfoRepository.getAllBankWithInfo().foreach(println)
+  Await.result(BankInfoRepository.getAllBankWithInfo, Duration.Inf) foreach {
+    case (bank: Bank, Some(bankInfo)) => println(s"$bank; $bankInfo.")
+    case (bank, None) => println(s"$bank has no information available.")
+  }
 
-  BankProductRepository.getAllBankWithProduct().foreach(println)
-
-  Thread.sleep(10 * 1000)
-
+  Await.result(BankProductRepository.getAllBankWithProduct, Duration.Inf) foreach {
+    case (bank: Bank, Some(bankProduct)) => println(s"$bank; $bankProduct.")
+    case (bank, None) => println(s"$bank has no products available.")
+  }
 }
