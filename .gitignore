@@ -1,4 +1,5 @@
 project/boot/
+*.log
 project/plugins/project/
 project/plugins/target/
 project/target/
