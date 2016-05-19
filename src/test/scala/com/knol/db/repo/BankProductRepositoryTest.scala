@@ -9,19 +9,19 @@ class BankProductRepositoryTest extends FunSuite with BankProductRepositoryLike 
   implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
   test("Add new Product ") {
-    whenReady(create(BankProduct("car loan", 1))) { productId =>
+    whenReady(createAsync(BankProduct("car loan", 1))) { productId =>
       assert(productId === 3)
     }
   }
 
   test("Update bank product ") {
-    whenReady(update(BankProduct("Home Loan", 1, Some(1)))) { response =>
+    whenReady(updateAsync(BankProduct("Home Loan", 1, Some(1)))) { response =>
       assert(response === 1)
     }
   }
 
   test("Delete bank info") {
-    whenReady(delete(1)) { response =>
+    whenReady(deleteAsync(1)) { response =>
       assert(response === 1)
     }
   }
@@ -31,7 +31,7 @@ class BankProductRepositoryTest extends FunSuite with BankProductRepositoryLike 
       BankProduct("Home loan", 1, Some(1)),
       BankProduct("Eduction loan", 1, Some(2))
     )
-    whenReady(getAll) { products =>
+    whenReady(getAllAsync) { products =>
       assert(products === desired)
     }
   }
@@ -41,7 +41,7 @@ class BankProductRepositoryTest extends FunSuite with BankProductRepositoryLike 
       (Bank("SBI bank", Some(1)), BankProduct("Home loan", 1, Some(1))),
       (Bank("SBI bank", Some(1)), BankProduct("Eduction loan", 1, Some(2)))
     )
-    whenReady(getBankWithProduct) { bankProduct =>
+    whenReady(getBankWithProductAsync) { bankProduct =>
       assert(bankProduct === desired)
     }
   }
@@ -52,7 +52,7 @@ class BankProductRepositoryTest extends FunSuite with BankProductRepositoryLike 
       (Bank("SBI bank", Some(1)), Some(BankProduct("Eduction loan", 1, Some(2)))),
       (Bank("PNB bank", Some(2)), None)
     )
-    whenReady(getAllBankWithProduct) { bankProduct =>
+    whenReady(getAllBankWithProductAsync) { bankProduct =>
       assert(bankProduct === desired)
     }
   }

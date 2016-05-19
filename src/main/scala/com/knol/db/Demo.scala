@@ -7,27 +7,27 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util._
 
 object Demo extends App {
-  BankRepository.create(Bank("ICICI bank")) onComplete {
+  BankRepository.createAsync(Bank("ICICI bank")) onComplete {
     case Success(id) =>
-      BankProductRepository.create(BankProduct("Car loan", id))
-      BankInfoRepository.create(BankInfo("Government", 1000, id))
+      BankProductRepository.createAsync(BankProduct("Car loan", id))
+      BankInfoRepository.createAsync(BankInfo("Government", 1000, id))
       BankRepository.create(Bank("SBI Bank"))
 
     case Failure(e) =>
       println(s"Error ${ e.getCause }: ${ e.getMessage }")
   }
 
-  Await.result(BankInfoRepository.getAllBankWithInfo, Duration.Inf) foreach {
+  Await.result(BankInfoRepository.getAllBankWithInfoAsync, Duration.Inf) foreach {
     case (bank: Bank, Some(bankInfo)) => println(s"$bank; $bankInfo.")
     case (bank, None) => println(s"$bank has no information available.")
   }
 
-  Await.result(BankProductRepository.getAllBankWithProduct, Duration.Inf) foreach {
+  Await.result(BankProductRepository.getAllBankWithProductAsync, Duration.Inf) foreach {
     case (bank: Bank, Some(bankProduct)) => println(s"$bank; $bankProduct.")
     case (bank, None) => println(s"$bank has no products available.")
   }
 
   BankRepository.deleteAll()
-  BankInfoRepository.deleteAll()
-  BankProductRepository.deleteAll()
+  BankInfoRepository.deleteAllAsync()
+  BankProductRepository.deleteAllAsync()
 }

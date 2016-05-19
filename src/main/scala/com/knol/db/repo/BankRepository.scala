@@ -11,8 +11,9 @@ protected[repo] trait BankTable { this: DBComponent =>
   import driver.api._
 
   private[BankTable] class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
-    val id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    val id   = column[Int]("id", O.PrimaryKey, O.AutoInc)
     val name = column[String]("name")
+
     def * = (name, id.?) <> (Bank.tupled, Bank.unapply)
   }
 
@@ -26,26 +27,32 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
   import driver.api._
 
   // Cannot be a val because the query has not initialized yet when the trait constructor runs
-  def schemaDDL = bankTableQuery.schema.create.statements
-  def makeSchema = Await.result(db.run(bankTableQuery.schema.create), Duration.Inf)
+  @inline def schemaDDL = bankTableQuery.schema.create.statements
+  @inline def makeSchema = Await.result(db.run(bankTableQuery.schema.create), Duration.Inf)
 
   /** create new bank */
-  def create(bank: Bank): Future[Int] = db.run { bankTableAutoInc += bank }
+  @inline def createAsync(bank: Bank): Future[Int] = db.run { bankTableAutoInc += bank }
+  @inline def create(bank: Bank): Int = Await.result(createAsync(bank), Duration.Inf)
 
   /** delete all banks */
-  def deleteAll(): Future[Int] = db.run { bankTableQuery.delete }
+  @inline def deleteAllAsync(): Future[Int] = db.run { bankTableQuery.delete }
+  @inline def deleteAll(): Int = Await.result(deleteAllAsync(), Duration.Inf)
 
   /** update existing bank */
-  def update(bank: Bank): Future[Int] = db.run { bankTableQuery.filter(_.id === bank.id.get).update(bank) }
+  @inline def updateAsync(bank: Bank): Future[Int] = db.run { bankTableQuery.filter(_.id === bank.id.get).update(bank) }
+  @inline def update(bank: Bank): Int = Await.result(updateAsync(bank), Duration.Inf)
 
   /** Get bank by id */
-  def getById(id: Int): Future[Option[Bank]] = db.run { bankTableQuery.filter(_.id === id).result.headOption }
+  @inline def getByIdAsync(id: Int): Future[Option[Bank]] = db.run { bankTableQuery.filter(_.id === id).result.headOption }
+  @inline def getById(id: Int): Option[Bank] = Await.result(getByIdAsync(id), Duration.Inf)
 
   /** Get all banks */
-  def getAll: Future[List[Bank]] = db.run { bankTableQuery.to[List].result }
+  @inline def getAllAsync: Future[List[Bank]] = db.run { bankTableQuery.to[List].result }
+  @inline def getAll: List[Bank] = Await.result(getAllAsync, Duration.Inf)
 
   /** delete bank by id */
-  def delete(id: Int): Future[Int] = db.run { bankTableQuery.filter(_.id === id).delete }
+  @inline def deleteAsync(id: Int): Future[Int] = db.run { bankTableQuery.filter(_.id === id).delete }
+  @inline def delete(id: Int): Int = Await.result(deleteAsync(id), Duration.Inf)
 }
 
 object BankRepository extends BankRepositoryLike with SelectedDB {

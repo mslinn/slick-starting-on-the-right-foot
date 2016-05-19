@@ -1,7 +1,7 @@
 package com.knol.db.repo
 
 import com.knol.db.connection.{DBComponent, SelectedDB}
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 case class BankProduct(name: String, bankId: Int, id: Option[Int] = None) {
   override def toString = s"Product $name #$bankId"
@@ -24,24 +24,31 @@ private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
 }
 
 trait BankProductRepositoryLike extends BankProductTable { this: DBComponent =>
+  import concurrent.duration.Duration
   import driver.api._
 
-  def create(bankProduct: BankProduct): Future[Int] = db.run { bankProductTableAutoInc += bankProduct }
+  @inline def createAsync(bankProduct: BankProduct): Future[Int] = db.run { bankProductTableAutoInc += bankProduct }
+  @inline def create(bankProduct: BankProduct): Int = Await.result(createAsync(bankProduct), Duration.Inf)
 
-  def deleteAll(): Future[Int] = db.run { bankProductTableQuery.delete }
+  @inline def deleteAllAsync(): Future[Int] = db.run { bankProductTableQuery.delete }
+  @inline def deleteAll(): Int = Await.result(deleteAllAsync(), Duration.Inf)
 
-  def update(bankProduct: BankProduct): Future[Int] = db.run { bankProductTableQuery.filter(_.id === bankProduct.id.get).update(bankProduct) }
+  @inline def updateAsync(bankProduct: BankProduct): Future[Int] = db.run { bankProductTableQuery.filter(_.id === bankProduct.id.get).update(bankProduct) }
+  @inline def update(bankProduct: BankProduct): Int = Await.result(updateAsync(bankProduct), Duration.Inf)
 
-  def getById(id: Int): Future[Option[BankProduct]] = db.run { bankProductTableQuery.filter(_.id === id).result.headOption }
+  @inline def getByIdAsync(id: Int): Future[Option[BankProduct]] = db.run { bankProductTableQuery.filter(_.id === id).result.headOption }
+  @inline def getById(id: Int): Option[BankProduct] = Await.result(getByIdAsync(id), Duration.Inf)
 
-  def getAll: Future[List[BankProduct]] = db.run { bankProductTableQuery.to[List].result }
+  @inline def getAllAsync: Future[List[BankProduct]] = db.run { bankProductTableQuery.to[List].result }
+  @inline def getAll: List[BankProduct] = Await.result(getAllAsync, Duration.Inf)
 
-  def delete(id: Int): Future[Int] = db.run { bankProductTableQuery.filter(_.id === id).delete }
+  @inline def deleteAsync(id: Int): Future[Int] = db.run { bankProductTableQuery.filter(_.id === id).delete }
+  @inline def delete(id: Int): Int = Await.result(deleteAsync(id), Duration.Inf)
 
   /**
    * Get bank and product using foreign key relationship
    */
-  def getBankWithProduct: Future[List[(Bank, BankProduct)]] =
+  @inline def getBankWithProductAsync: Future[List[(Bank, BankProduct)]] =
     db.run {
       (for {
         product <- bankProductTableQuery
@@ -49,13 +56,18 @@ trait BankProductRepositoryLike extends BankProductTable { this: DBComponent =>
       } yield (bank, product)).to[List].result
     }
 
+  @inline def getBankWithProduct: List[(Bank, BankProduct)] = Await.result(getBankWithProductAsync, Duration.Inf)
+
   /**
    * Get all bank and their product.It is possible some bank do not have their product
    */
-  def getAllBankWithProduct: Future[List[(Bank, Option[BankProduct])]] =
+  @inline def getAllBankWithProductAsync: Future[List[(Bank, Option[BankProduct])]] =
     db.run {
       bankTableQuery.joinLeft(bankProductTableQuery).on(_.id === _.bankId).to[List].result
     }
+
+  @inline def getAllBankWithProduct: List[(Bank, Option[BankProduct])] =
+    Await.result(getAllBankWithProductAsync, Duration.Inf)
 }
 
 object BankProductRepository extends BankProductRepositoryLike with SelectedDB

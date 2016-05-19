@@ -9,25 +9,25 @@ class BankRepositoryTest extends FunSuite with BankRepositoryLike with H2DBCompo
   implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
   test("Add new bank ") {
-    whenReady(create(Bank("ICICI bank"))) { bankId =>
+    whenReady(createAsync(Bank("ICICI bank"))) { bankId =>
       assert(bankId === 3)
     }
   }
 
   test("Update  SBI bank  ") {
-    whenReady(update(Bank("SBI Bank", Some(1)))) { bankId =>
+    whenReady(updateAsync(Bank("SBI Bank", Some(1)))) { bankId =>
       assert(bankId === 1)
     }
   }
 
   test("Delete SBI bank  ") {
-    whenReady(delete(2)) { response =>
+    whenReady(deleteAsync(2)) { response =>
       assert(response === 1)
     }
   }
 
   test("Get bank list") {
-    whenReady(getAll) { result =>
+    whenReady(getAllAsync) { result =>
       assert(result === List(Bank("SBI bank", Some(1)), Bank("PNB bank", Some(2))))
     }
   }
