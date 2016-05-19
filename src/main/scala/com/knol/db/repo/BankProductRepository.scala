@@ -25,7 +25,7 @@ private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
   protected def autoInc = tableQuery returning tableQuery.map(_.id)
 }
 
-trait BankProductRepositoryLike extends BankProductTable { this: DBComponent =>
+private[repo] trait BankProductRepositoryLike extends BankProductTable { this: DBComponent =>
   import concurrent.duration.Duration
   import driver.api._
 
