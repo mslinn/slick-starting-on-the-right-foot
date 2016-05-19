@@ -1,6 +1,6 @@
 package com.knol.db.repo
 
-import com.knol.db.connection.{DBComponent, MySqlDBComponent, PostgresDBComponent}
+import com.knol.db.connection.{DBComponent, SelectedDB}
 import scala.concurrent.Future
 
 trait BankInfoRepository extends BankInfoTable { this: DBComponent =>
@@ -55,7 +55,7 @@ private[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
   protected def bankTableInfoAutoInc = bankInfoTableQuery returning bankInfoTableQuery.map(_.id)
 }
 
-object BankInfoRepository extends BankInfoRepository with PostgresDBComponent
+object BankInfoRepository extends BankInfoRepository with SelectedDB
 
 case class BankInfo(owner: String, branches: Int, bankId: Int, id: Option[Int] = None) {
   override def toString = s"""BankInfo for $owner; bankId #$bankId; $branches branches."""

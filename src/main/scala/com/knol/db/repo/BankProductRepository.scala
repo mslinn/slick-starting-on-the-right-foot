@@ -1,6 +1,6 @@
 package com.knol.db.repo
 
-import com.knol.db.connection.{DBComponent, MySqlDBComponent, PostgresDBComponent}
+import com.knol.db.connection.{DBComponent, SelectedDB}
 import scala.concurrent.Future
 
 trait BankProductRepository extends BankProductTable { this: DBComponent =>
@@ -54,7 +54,7 @@ private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
   protected def bankProductTableAutoInc = bankProductTableQuery returning bankProductTableQuery.map(_.id)
 }
 
-object BankProductRepository extends BankProductRepository with PostgresDBComponent
+object BankProductRepository extends BankProductRepository with SelectedDB
 
 case class BankProduct(name: String, bankId: Int, id: Option[Int] = None) {
   override def toString = s"Product $name #$bankId"

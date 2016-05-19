@@ -44,7 +44,7 @@ protected[repo] trait BankRepository extends BankTable { this: DBComponent =>
   def delete(id: Int): Future[Int] = db.run { bankTableQuery.filter(_.id === id).delete }
 }
 
-object BankRepository extends BankRepository with PostgresDBComponent {
+object BankRepository extends BankRepository with SelectedDB {
   //println(schemaDDL.mkString("\n"))
 }
 

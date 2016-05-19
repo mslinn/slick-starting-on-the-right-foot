@@ -15,3 +15,5 @@ trait PostgresDBComponent extends DBComponent {
   val driver = PostgresDriver
   val db: Database = Database.forConfig("postgres")
 }
+
+trait SelectedDB extends PostgresDBComponent
