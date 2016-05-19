@@ -10,16 +10,16 @@ case class Bank(name: String, id: Option[Int] = None) {
 protected[repo] trait BankTable { this: DBComponent =>
   import driver.api._
 
-  private[BankTable] class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
+  class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
     val id   = column[Int]("id", O.PrimaryKey, O.AutoInc)
     val name = column[String]("name")
 
     def * = (name, id.?) <> (Bank.tupled, Bank.unapply)
   }
 
-  protected val bankTableQuery = TableQuery[BankTable]
+  val bankTableQuery = TableQuery[BankTable]
 
-  protected def bankTableAutoInc = bankTableQuery returning bankTableQuery.map(_.id)
+  def bankTableAutoInc = bankTableQuery returning bankTableQuery.map(_.id)
 }
 
 protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =>

@@ -10,7 +10,7 @@ case class BankInfo(owner: String, branches: Int, bankId: Int, id: Option[Int] =
 private[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
   import driver.api._
 
-  private[BankInfoTable] class BankInfoTable(tag: Tag) extends Table[BankInfo](tag, "bankinfo") {
+  class BankInfoTable(tag: Tag) extends Table[BankInfo](tag, "bankinfo") {
     val id       = column[Int]("id", O.PrimaryKey, O.AutoInc)
     val owner    = column[String]("owner")
     val bankId   = column[Int]("bank_id")
@@ -21,9 +21,9 @@ private[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
     def * = (owner, branches, bankId, id.?) <> (BankInfo.tupled, BankInfo.unapply)
   }
 
-  protected val tableQuery = TableQuery[BankInfoTable]
+  val tableQuery = TableQuery[BankInfoTable]
 
-  protected def autoInc = tableQuery returning tableQuery.map(_.id)
+  def autoInc = tableQuery returning tableQuery.map(_.id)
 }
 
 private[repo] trait BankInfoRepositoryLike extends BankInfoTable { this: DBComponent =>
