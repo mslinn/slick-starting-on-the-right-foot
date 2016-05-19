@@ -43,7 +43,8 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
   @inline def update(bank: Bank): Int = Await.result(updateAsync(bank), Duration.Inf)
 
   /** Get bank by id */
-  @inline def getByIdAsync(id: Int): Future[Option[Bank]] = db.run { bankTableQuery.filter(_.id === id).result.headOption }
+  @inline def getByIdAsync(id: Int): Future[Option[Bank]] =
+    db.run { bankTableQuery.filter(_.id === id).result.headOption }
   @inline def getById(id: Int): Option[Bank] = Await.result(getByIdAsync(id), Duration.Inf)
 
   /** Get all banks */
