@@ -8,6 +8,8 @@ trait BankInfoRepository extends BankInfoTable { this: DBComponent =>
 
   def create(bankInfo: BankInfo): Future[Int] = db.run { bankTableInfoAutoInc += bankInfo }
 
+  def deleteAll(): Future[Int] = db.run { bankInfoTableQuery.delete }
+
   def update(bankInfo: BankInfo): Future[Int] = db.run { bankInfoTableQuery.filter(_.id === bankInfo.id.get).update(bankInfo) }
 
   def getById(id: Int): Future[Option[BankInfo]] = db.run { bankInfoTableQuery.filter(_.id === id).result.headOption }

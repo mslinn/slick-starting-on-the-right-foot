@@ -26,4 +26,8 @@ object Demo extends App {
     case (bank: Bank, Some(bankProduct)) => println(s"$bank; $bankProduct.")
     case (bank, None) => println(s"$bank has no products available.")
   }
+
+  BankRepository.deleteAll()
+  BankInfoRepository.deleteAll()
+  BankProductRepository.deleteAll()
 }

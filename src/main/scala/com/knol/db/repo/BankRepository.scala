@@ -28,6 +28,9 @@ protected[repo] trait BankRepository extends BankTable { this: DBComponent =>
   /** create new bank */
   def create(bank: Bank): Future[Int] = db.run { bankTableAutoInc += bank }
 
+  /** delete all banks */
+  def deleteAll(): Future[Int] = db.run { bankTableQuery.delete }
+
   /** update existing bank */
   def update(bank: Bank): Future[Int] = db.run { bankTableQuery.filter(_.id === bank.id.get).update(bank) }
 
