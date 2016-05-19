@@ -19,7 +19,7 @@ protected[repo] trait BankTable { this: DBComponent =>
 
 protected[repo] trait BankRepository extends BankTable { this: DBComponent =>
   import concurrent.duration.Duration
-  import slick.driver.PostgresDriver.api._
+  import driver.api._
 
   // Cannot be a val because the query has not initialized yet when the trait constructor runs
   def schemaDDL = bankTableQuery.schema.create.statements
