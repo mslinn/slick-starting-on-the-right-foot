@@ -3,7 +3,27 @@ package com.knol.db.repo
 import com.knol.db.connection.{DBComponent, SelectedDB}
 import scala.concurrent.Future
 
-trait BankProductRepository extends BankProductTable { this: DBComponent =>
+case class BankProduct(name: String, bankId: Int, id: Option[Int] = None) {
+  override def toString = s"Product $name #$bankId"
+}
+
+private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
+  import driver.api._
+
+  private[BankProductTable] class BankProductTable(tag: Tag) extends Table[BankProduct](tag, "bankproduct") {
+    val id     = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    val name   = column[String]("name")
+    val bankId = column[Int]("bank_id")
+    def bank   = foreignKey("bank_product_fk", bankId, bankTableQuery)(_.id)
+    def * = (name, bankId, id.?) <> (BankProduct.tupled, BankProduct.unapply)
+  }
+
+  protected val bankProductTableQuery = TableQuery[BankProductTable]
+
+  protected def bankProductTableAutoInc = bankProductTableQuery returning bankProductTableQuery.map(_.id)
+}
+
+trait BankProductRepositoryLike extends BankProductTable { this: DBComponent =>
   import driver.api._
 
   def create(bankProduct: BankProduct): Future[Int] = db.run { bankProductTableAutoInc += bankProduct }
@@ -38,24 +58,4 @@ trait BankProductRepository extends BankProductTable { this: DBComponent =>
     }
 }
 
-private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
-  import driver.api._
-
-  private[BankProductTable] class BankProductTable(tag: Tag) extends Table[BankProduct](tag, "bankproduct") {
-    val id     = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    val name   = column[String]("name")
-    val bankId = column[Int]("bank_id")
-    def bank   = foreignKey("bank_product_fk", bankId, bankTableQuery)(_.id)
-    def * = (name, bankId, id.?) <> (BankProduct.tupled, BankProduct.unapply)
-  }
-
-  protected val bankProductTableQuery = TableQuery[BankProductTable]
-
-  protected def bankProductTableAutoInc = bankProductTableQuery returning bankProductTableQuery.map(_.id)
-}
-
-object BankProductRepository extends BankProductRepository with SelectedDB
-
-case class BankProduct(name: String, bankId: Int, id: Option[Int] = None) {
-  override def toString = s"Product $name #$bankId"
-}
+object BankProductRepository extends BankProductRepositoryLike with SelectedDB

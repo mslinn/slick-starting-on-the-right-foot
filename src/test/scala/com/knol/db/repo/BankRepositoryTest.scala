@@ -5,7 +5,7 @@ import com.knol.db.connection.H2DBComponent
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{ Millis, Seconds, Span }
 
-class BankRepositoryTest extends FunSuite with BankRepository with H2DBComponent with ScalaFutures {
+class BankRepositoryTest extends FunSuite with BankRepositoryLike with H2DBComponent with ScalaFutures {
   implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
   test("Add new bank ") {

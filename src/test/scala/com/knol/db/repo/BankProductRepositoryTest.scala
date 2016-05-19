@@ -5,7 +5,7 @@ import org.scalatest.FunSuite
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 
-class BankProductRepositoryTest extends FunSuite with BankProductRepository with H2DBComponent with ScalaFutures {
+class BankProductRepositoryTest extends FunSuite with BankProductRepositoryLike with H2DBComponent with ScalaFutures {
   implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
   test("Add new Product ") {

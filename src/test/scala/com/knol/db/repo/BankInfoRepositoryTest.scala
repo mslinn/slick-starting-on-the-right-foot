@@ -6,7 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import scala.concurrent.Future
 
-class BankInfoRepositoryTest extends FunSuite with BankInfoRepository with H2DBComponent with ScalaFutures {
+class BankInfoRepositoryTest extends FunSuite with BankInfoRepositoryLike with H2DBComponent with ScalaFutures {
   implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
   test("Add new bank info") {

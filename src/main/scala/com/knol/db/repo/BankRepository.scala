@@ -3,6 +3,10 @@ package com.knol.db.repo
 import com.knol.db.connection._
 import scala.concurrent.{Await, Future}
 
+case class Bank(name: String, id: Option[Int] = None) {
+  override def toString = s"""Bank $name ${ id.map(x => s"id #$x").mkString }"""
+}
+
 protected[repo] trait BankTable { this: DBComponent =>
   import driver.api._
 
@@ -17,7 +21,7 @@ protected[repo] trait BankTable { this: DBComponent =>
   protected def bankTableAutoInc = bankTableQuery returning bankTableQuery.map(_.id)
 }
 
-protected[repo] trait BankRepository extends BankTable { this: DBComponent =>
+protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =>
   import concurrent.duration.Duration
   import driver.api._
 
@@ -44,10 +48,6 @@ protected[repo] trait BankRepository extends BankTable { this: DBComponent =>
   def delete(id: Int): Future[Int] = db.run { bankTableQuery.filter(_.id === id).delete }
 }
 
-object BankRepository extends BankRepository with SelectedDB {
+object BankRepository extends BankRepositoryLike with SelectedDB {
   //println(schemaDDL.mkString("\n"))
-}
-
-case class Bank(name: String, id: Option[Int] = None) {
-  override def toString = s"""Bank $name ${ id.map(x => s"id #$x").mkString }"""
 }
