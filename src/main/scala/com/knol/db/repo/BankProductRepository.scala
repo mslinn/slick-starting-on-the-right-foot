@@ -54,7 +54,7 @@ trait BankProductRepositoryLike extends BankProductTable { this: DBComponent =>
     db.run {
       (for {
         product <- tableQuery
-        bank <- product.bankFK
+        bank    <- product.bankFK
       } yield (bank, product)).to[List].result
     }
 

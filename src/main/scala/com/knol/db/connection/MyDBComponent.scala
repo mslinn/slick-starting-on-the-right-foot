@@ -5,7 +5,6 @@ package connection {
     import slick.driver.JdbcProfile
 
     val driver: JdbcProfile
-
     import driver.api._
 
     val db: Database
