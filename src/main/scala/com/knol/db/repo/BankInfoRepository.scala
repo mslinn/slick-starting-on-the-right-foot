@@ -1,7 +1,6 @@
 package com.knol.db.repo
 
 import com.knol.db.connection.{DBComponent, SelectedDB}
-import slick.driver
 import scala.concurrent.{Await, Future}
 import concurrent.duration.Duration
 
