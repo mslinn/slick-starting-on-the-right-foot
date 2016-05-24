@@ -28,7 +28,7 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
 
   // Cannot be a val because the query has not initialized yet when the trait constructor runs
   @inline def schemaDDL = bankTableQuery.schema.create.statements
-  @inline def makeSchema = Await.result(db.run(bankTableQuery.schema.create), Duration.Inf)
+  @inline def makeSchema(): Unit = Await.ready(db.run(bankTableQuery.schema.create), Duration.Inf)
 
   /** create new bank */
   @inline def createAsync(bank: Bank): Future[Int] = db.run { bankTableAutoInc += bank }

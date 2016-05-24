@@ -1,11 +1,46 @@
 package com.knol.db.repo
 
 import com.knol.db.connection.{DBComponent, SelectedDB}
+import slick.driver
 import scala.concurrent.{Await, Future}
 import concurrent.duration.Duration
 
 trait HasId {
   def id: Option[Int] = None
+}
+
+trait LiftedHasId {
+  def id: slick.lifted.Rep[Int]
+}
+
+/** Handles all actions pertaining to HasId or that do not require parameters */
+trait DbAction[T <: HasId] { this: DBComponent =>
+  import driver.api._ // defines DBIOAction
+
+  type QueryType <: slick.lifted.TableQuery[_ <: Table[T] with LiftedHasId]
+  def tableQuery: QueryType
+
+  // Is this defined correctly?
+  @inline def run[R](action: DBIOAction[R, NoStream, Nothing]): Future[R] = db.run { action }
+
+  @inline def deleteAsync(id: Int): Future[Int] = run { tableQuery.filter(_.id === id).delete }
+  @inline def delete(id: Int): Int = Await.result(deleteAsync(id), Duration.Inf)
+
+  @inline def deleteAllAsync(): Future[Int] = run { tableQuery.delete }
+  @inline def deleteAll(): Int = Await.result(deleteAllAsync(), Duration.Inf)
+
+  @inline def getAllAsync: Future[List[T]] = run { tableQuery.to[List].result }
+  @inline def getAll: List[T] = Await.result(getAllAsync, Duration.Inf)
+
+  @inline def getByIdAsync(id: Int): Future[Option[T]] =
+    run { tableQuery.filter(_.id === id).result.headOption }
+
+  @inline def getById(id: Int): Option[T] = Await.result(getByIdAsync(id), Duration.Inf)
+
+  @inline def deleteById(id: Option[Int]): Unit =
+    for { i <- id } run { tableQuery.filter(_.id === id).delete }
+
+  @inline def findAll: Future[List[T]] = run { tableQuery.to[List].result }
 }
 
 case class BankInfo(owner: String, branches: Int, bankId: Int, override val id: Option[Int] = None) extends HasId {
@@ -26,41 +61,18 @@ private[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
     def * = (owner, branches, bankId, id.?) <> (BankInfo.tupled, BankInfo.unapply)
   }
 
+  type QueryType = TableQuery[BankInfoTable]
+
   val tableQuery = TableQuery[BankInfoTable]
 
   def autoInc = tableQuery returning tableQuery.map(_.id)
 }
 
-/** Handles all actions pertaining to HasId or that do not require parameters */
-trait DbAction[T <: HasId] { this: DBComponent =>
-  import driver.api._ // defines DBIOAction
-
-  type QueryType <: slick.lifted.TableQuery[Table[T]] // this is wrong! What should it be?
-  def tableQuery: QueryType
-
-  // Is this defined correctly?
-  @inline def run[R](action: DBIOAction[R, NoStream, Nothing]): Future[R] = db.run { action }
-
-  @inline def deleteAsync(id: Int): Future[Int] = run { tableQuery.filter(_.id === id).delete }
-  @inline def delete(id: Int): Int = Await.result(deleteAsync(id), Duration.Inf)
-
-  @inline def deleteAllAsync(): Future[Int] = run { tableQuery.delete }
-  @inline def deleteAll(): Int = Await.result(deleteAllAsync(), Duration.Inf)
-
-  @inline def getAllAsync: Future[List[BankInfo]] = run { tableQuery.to[List].result }
-  @inline def getAll: List[BankInfo] = Await.result(getAllAsync, Duration.Inf)
-
-  @inline def getByIdAsync(id: Int): Future[Option[BankInfo]] =
-    run { tableQuery.filter(_.id === id).result.headOption }
-
-  @inline def getById(id: Int): Option[BankInfo] = Await.result(getByIdAsync(id), Duration.Inf)
-
-  @inline def deleteById(id: Option[Int]): Unit =
-    for { i <- id } run { tableQuery.filter(_.id === id).delete } // id is unknown
-
-  @inline def findAll: Future[List[T]] = run { tableQuery.to[List].result } // also b0rked
-}
-
+/* Error:(71, 21) overriding type QueryType in trait DbAction with bounds
+  <: slick.lifted.TableQuery[_ <: BankInfoRepositoryLike.this.driver.api.Table[com.knol.db.repo.BankInfo] with com.knol.db.repo.LiftedHasId];
+ type QueryType in trait BankInfoTable, which equals BankInfoRepositoryLike.this.driver.api.TableQuery[BankInfoRepositoryLike.this.BankInfoTable] has incompatible type
+private[repo] trait BankInfoRepositoryLike extends BankInfoTable with DbAction[BankInfo] { this: DBComponent =>
+                    ^ */
 private[repo] trait BankInfoRepositoryLike extends BankInfoTable with DbAction[BankInfo] { this: DBComponent =>
   import driver.api._
 
@@ -89,6 +101,4 @@ private[repo] trait BankInfoRepositoryLike extends BankInfoTable with DbAction[B
   @inline def getAllBankWithInfo: List[(Bank, Option[BankInfo])] = Await.result(getAllBankWithInfoAsync, Duration.Inf)
 }
 
-object BankInfoRepository extends BankInfoRepositoryLike with SelectedDB {
-  type QueryType = Nothing
-}
+object BankInfoRepository extends BankInfoRepositoryLike with SelectedDB
