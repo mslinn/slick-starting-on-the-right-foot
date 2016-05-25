@@ -24,8 +24,8 @@ protected[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
 
   type QueryType = TableQuery[BankInfoTable]
   val tableQuery = TableQuery[BankInfoTable]
-
   def autoInc = tableQuery returning tableQuery.map(_.id)
+  lazy val schema: driver.DDL = tableQuery.schema
 }
 
 protected[repo] trait BankInfoRepositoryLike extends BankInfoTable with HasIdActionLike[BankInfo] { this: DBComponent =>

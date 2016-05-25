@@ -19,12 +19,10 @@ trait HasIdActionLike[T <: HasId] { this: DBComponent =>
 
   type QueryType <: TableQuery[_ <: Table[T] with LiftedHasId]
   def tableQuery: QueryType
+  val schema: driver.DDL
 
-  //@inline def createTable(): Unit = Await.result(createTableAsync(), dbDuration)
-  //@inline def createTableAsync(): Future[Unit] = runAsync { tableQuery.schema.create }
-  /* Error:(26, 67) value schema is not a member of HasIdActionLike.this.QueryType
-    @inline def createTableAsync(): Future[Unit] = runAsync { tableQuery.schema.create }
-                                                                    ^ */
+  @inline def createTable(): Unit = Await.result(createTableAsync(), dbDuration)
+  @inline def createTableAsync(): Future[Unit] = runAsync { schema.create }
 
   @inline def delete(id: Int): Int = Await.result(deleteAsync(id), dbDuration)
   @inline def deleteAsync(id: Int): Future[Int] = runAsync { tableQuery.filter(_.id === id).delete }
