@@ -29,7 +29,7 @@ class BankInfoRepositoryTest extends FunSuite with BankInfoRepositoryLike with H
 
   test("Get bank info list") {
     val desired: List[BankInfo] = List(BankInfo("Government", 10000, 1, Some(1)))
-    whenReady(getAllAsync) { bankInfos =>
+    whenReady(findAllAsync) { bankInfos =>
       assert(bankInfos === desired)
     }
   }
