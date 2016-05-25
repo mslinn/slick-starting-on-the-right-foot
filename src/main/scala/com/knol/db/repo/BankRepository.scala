@@ -8,7 +8,7 @@ case class Bank(name: String, id: Option[Int] = None) {
 }
 
 protected[repo] trait BankTable { this: DBComponent =>
-  import driver.api._
+  import driver.api._ // defines DBIOAction and other important bits
 
   class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
     val id   = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -24,7 +24,7 @@ protected[repo] trait BankTable { this: DBComponent =>
 
 protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =>
   import concurrent.duration.Duration
-  import driver.api._
+  import driver.api._ // defines DBIOAction and other important bits
 
   // Cannot be a val because the query has not initialized yet when the trait constructor runs
   @inline def schemaDDL = bankTableQuery.schema.create.statements

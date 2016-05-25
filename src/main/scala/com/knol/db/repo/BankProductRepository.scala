@@ -8,7 +8,7 @@ case class BankProduct(name: String, bankId: Int, id: Option[Int] = None) {
 }
 
 private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
-  import driver.api._
+  import driver.api._ // defines DBIOAction and other important bits
 
   class BankProductTable(tag: Tag) extends Table[BankProduct](tag, "bankproduct") {
     val id     = column[Int]("id", O.PrimaryKey, O.AutoInc)
@@ -27,7 +27,7 @@ private[repo] trait BankProductTable extends BankTable { this: DBComponent =>
 
 private[repo] trait BankProductRepositoryLike extends BankProductTable { this: DBComponent =>
   import concurrent.duration.Duration
-  import driver.api._
+  import driver.api._ // defines DBIOAction and other important bits
 
   @inline def createAsync(bankProduct: BankProduct): Future[Int] = db.run { autoInc += bankProduct }
   @inline def create(bankProduct: BankProduct): Int = Await.result(createAsync(bankProduct), Duration.Inf)
