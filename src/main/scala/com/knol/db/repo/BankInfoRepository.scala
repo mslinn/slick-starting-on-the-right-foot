@@ -49,7 +49,7 @@ case class BankInfo(owner: String, branches: Int, bankId: Int, override val id: 
 private[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
   import driver.api._
 
-  class BankInfoTable(tag: Tag) extends Table[BankInfo](tag, "bankinfo") {
+  class BankInfoTable(tag: Tag) extends Table[BankInfo](tag, "bankinfo") with LiftedHasId {
     val id       = column[Int]("id", O.PrimaryKey, O.AutoInc)
     val owner    = column[String]("owner")
     val bankId   = column[Int]("bank_id")
