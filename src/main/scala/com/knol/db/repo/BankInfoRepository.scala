@@ -32,15 +32,15 @@ protected[repo] trait BankInfoRepositoryLike extends BankInfoTable with HasIdAct
   import driver.api._ // defines DBIOAction and other important bits
 
   @inline def updateAsync(bankInfo: BankInfo): Future[Int] =
-    run { tableQuery.filter(_.id === bankInfo.id.get).update(bankInfo) }
+    runAsync { tableQuery.filter(_.id === bankInfo.id.get).update(bankInfo) }
   @inline def update(bankInfo: BankInfo): Int = Await.result(updateAsync(bankInfo), Duration.Inf)
 
-  @inline def createAsync(bankInfo: BankInfo): Future[Int] = run { autoInc += bankInfo }
+  @inline def createAsync(bankInfo: BankInfo): Future[Int] = runAsync { autoInc += bankInfo }
   @inline def create(bankInfo: BankInfo): Int = Await.result(createAsync(bankInfo), Duration.Inf)
 
   /** Get bank and info using foreign key relationship */
   @inline def getBankWithInfoAsync: Future[List[(Bank, BankInfo)]] =
-    run {
+    runAsync {
       (for {
         info <- tableQuery
         bank <- info.bankFK
@@ -50,7 +50,7 @@ protected[repo] trait BankInfoRepositoryLike extends BankInfoTable with HasIdAct
 
   /** Get all bank and their info.It is possible some bank do not have their product */
   @inline def getAllBankWithInfoAsync: Future[List[(Bank, Option[BankInfo])]] =
-    run {
+    runAsync {
       bankTableQuery.joinLeft(tableQuery).on(_.id === _.bankId).to[List].result
     }
   @inline def getAllBankWithInfo: List[(Bank, Option[BankInfo])] = Await.result(getAllBankWithInfoAsync, Duration.Inf)
