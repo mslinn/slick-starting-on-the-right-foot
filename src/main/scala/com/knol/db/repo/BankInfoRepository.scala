@@ -1,8 +1,9 @@
 package com.knol.db.repo
 
 import com.knol.db.connection.{DBComponent, SelectedDB}
+import com.knol.db.Misc.Logger
 import scala.concurrent.{Await, Future}
-import concurrent.duration.Duration
+import scala.concurrent.duration.Duration
 
 case class BankInfo(owner: String, branches: Int, bankId: Int, override val id: Option[Int] = None) extends HasId {
   override def toString = s"""BankInfo for $owner; bankId #$bankId; $branches branches."""
@@ -24,17 +25,19 @@ protected[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
 
   type QueryType = TableQuery[BankInfoTable]
   val tableQuery = TableQuery[BankInfoTable]
-  def autoInc = tableQuery returning tableQuery.map(_.id)
+  def autoInc = tableQuery returning tableQuery
   lazy val schema: driver.DDL = tableQuery.schema
 }
 
 protected[repo] trait BankInfoRepositoryLike extends BankInfoTable with HasIdActionLike[BankInfo] { this: DBComponent =>
   import driver.api._ // defines DBIOAction and other important bits
 
-  @inline def createAsync(bankInfo: BankInfo): Future[Int] = runAsync { autoInc += bankInfo }
-  @inline def create(bankInfo: BankInfo): Int = Await.result(createAsync(bankInfo), Duration.Inf)
+  @inline def create(bankInfo: BankInfo): BankInfo = Await.result(createAsync(bankInfo), Duration.Inf)
+  @inline def createAsync(bankInfo: BankInfo): Future[BankInfo] = runAsync { autoInc += bankInfo }
 
   /** Get bank and info using foreign key relationship */
+  @inline def getBankWithInfo: List[(Bank, BankInfo)] = Await.result(getBankWithInfoAsync, Duration.Inf)
+
   @inline def getBankWithInfoAsync: Future[List[(Bank, BankInfo)]] =
     runAsync {
       (for {
@@ -42,22 +45,36 @@ protected[repo] trait BankInfoRepositoryLike extends BankInfoTable with HasIdAct
         bank <- info.bankFK
       } yield (bank, info)).to[List].result
     }
-  @inline def getBankWithInfo: List[(Bank, BankInfo)] = Await.result(getBankWithInfoAsync, Duration.Inf)
+
+
+  @inline def getAllBankWithInfo: List[(Bank, Option[BankInfo])] = Await.result(getAllBankWithInfoAsync, Duration.Inf)
 
   /** Get all bank and their info.It is possible some bank do not have their product */
   @inline def getAllBankWithInfoAsync: Future[List[(Bank, Option[BankInfo])]] =
     runAsync {
       bankTableQuery.joinLeft(tableQuery).on(_.id === _.bankId).to[List].result
     }
-  @inline def getAllBankWithInfo: List[(Bank, Option[BankInfo])] = Await.result(getAllBankWithInfoAsync, Duration.Inf)
+
+
+  @inline def update(bankInfo: BankInfo): Int = Await.result(updateAsync(bankInfo), Duration.Inf)
 
   @inline def updateAsync(bankInfo: BankInfo): Future[Int] =
     runAsync { tableQuery.filter(_.id === bankInfo.id.get).update(bankInfo) }
-  @inline def update(bankInfo: BankInfo): Int = Await.result(updateAsync(bankInfo), Duration.Inf)
 
-  @inline def upsertAsync(bankInfo: BankInfo): Future[Int] =
-    db.run { tableQuery.filter(_.id === bankInfo.id.get).insertOrUpdate(bankInfo) }
-  @inline def upsert(bankInfo: BankInfo): Int = Await.result(upsertAsync(bankInfo), Duration.Inf)
+
+  @inline def upsert(bankInfo: BankInfo): Option[BankInfo] = Await.result(upsertAsync(bankInfo), Duration.Inf)
+
+  @inline def upsertAsync(bankInfo: BankInfo): Future[Option[BankInfo]] =
+    db.run { autoInc.insertOrUpdate(bankInfo) }
+
+  @inline def upsertOrDie(bankInfo: BankInfo): BankInfo =
+    try {
+      upsert(bankInfo).get
+    } catch {
+      case ex: Exception =>
+        Logger.error(s"Could not upsert $bankInfo; ${ ex.getMessage }: ${ ex.getCause }")
+        throw ex
+    }
 }
 
 object BankInfoRepository extends BankInfoRepositoryLike with SelectedDB

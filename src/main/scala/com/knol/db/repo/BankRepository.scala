@@ -1,10 +1,13 @@
 package com.knol.db.repo
 
+import com.knol.db.Misc.Logger
 import com.knol.db.connection._
 import scala.concurrent.{Await, Future}
 
 case class Bank(name: String, id: Option[Int] = None) {
   override def toString = s"""Bank $name ${ id.map(x => s"id #$x").mkString }"""
+
+  def idAsInt = id.getOrElse(0)
 }
 
 protected[repo] trait BankTable { this: DBComponent =>
@@ -19,7 +22,7 @@ protected[repo] trait BankTable { this: DBComponent =>
 
   val bankTableQuery = TableQuery[BankTable]
 
-  def bankTableAutoInc = bankTableQuery returning bankTableQuery.map(_.id)// into copyUpdate
+  def bankTableAutoInc = bankTableQuery returning bankTableQuery
 }
 
 protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =>
@@ -31,8 +34,8 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
   @inline def makeSchema(): Unit = Await.ready(db.run(bankTableQuery.schema.create), Duration.Inf)
 
   /** create new bank */
-  @inline def createAsync(bank: Bank): Future[Int] = db.run { bankTableAutoInc += bank }
-  @inline def create(bank: Bank): Int = Await.result(createAsync(bank), Duration.Inf)
+  @inline def createAsync(bank: Bank): Future[Bank] = db.run { bankTableAutoInc += bank }
+  @inline def create(bank: Bank): Bank = Await.result(createAsync(bank), Duration.Inf)
 
   /** delete all banks */
   @inline def deleteAllAsync(): Future[Int] = db.run { bankTableQuery.delete }
@@ -55,9 +58,17 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
   @inline def updateAsync(bank: Bank): Future[Int] = db.run { bankTableQuery.filter(_.id === bank.id.get).update(bank) }
   @inline def update(bank: Bank): Int = Await.result(updateAsync(bank), Duration.Inf)
 
-  @inline def upsertAsync(bank: Bank): Future[Int] =
-    db.run { bankTableQuery.filter(_.id === bank.id.get).insertOrUpdate(bank) }
-  @inline def upsert(bank: Bank): Int = Await.result(upsertAsync(bank), Duration.Inf)
+  @inline def upsertAsync(bank: Bank): Future[Option[Bank]] =
+    db.run { bankTableAutoInc.insertOrUpdate(bank) }
+  @inline def upsert(bank: Bank): Option[Bank] = Await.result(upsertAsync(bank), Duration.Inf)
+  @inline def upsertOrDie(bank: Bank): Bank =
+    try {
+      upsert(bank).get
+    } catch {
+      case ex: Exception =>
+        Logger.error(s"Could not upsert $bank; ${ ex.getMessage }: ${ ex.getCause }")
+        throw ex
+    }
 }
 
 object BankRepository extends BankRepositoryLike with SelectedDB {

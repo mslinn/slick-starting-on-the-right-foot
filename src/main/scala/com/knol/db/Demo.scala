@@ -2,12 +2,15 @@ package com.knol.db
 
 import com.knol.db.repo._
 
-object Demo extends App {
+object Misc {
   val Logger = org.slf4j.LoggerFactory.getLogger("demo")
-  val id = BankRepository.create(Bank("ICICI bank"))
+}
+
+object Demo extends App {
+  val newBank: Bank = BankRepository.create(Bank("ICICI bank"))
   (1 to 99).indices.foreach { i =>
-    BankProductRepository.create(BankProduct(s"Car loan $i", id+i))
-    BankInfoRepository.create(BankInfo(s"Government $i", 1000+i, id+i))
+    BankProductRepository.create(BankProduct(s"Car loan $i", bankId=newBank.idAsInt))
+    BankInfoRepository.create(BankInfo(s"Government $i", 1000+i, bankId=newBank.idAsInt))
     BankRepository.create(Bank(s"SBI Bank $i"))
   }
 
