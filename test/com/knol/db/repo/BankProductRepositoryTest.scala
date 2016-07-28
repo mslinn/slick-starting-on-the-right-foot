@@ -1,6 +1,6 @@
 package com.knol.db.repo
 
-import com.knol.db.connection.{H2DBComponent, PostgresDBComponent}
+import com.knol.db.connection.PostgresDBComponent
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}

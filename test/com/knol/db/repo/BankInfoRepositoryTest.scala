@@ -1,6 +1,6 @@
 package com.knol.db.repo
 
-import com.knol.db.connection.{H2DBComponent, PostgresDBComponent}
+import com.knol.db.connection.PostgresDBComponent
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -31,7 +31,6 @@ class BankInfoRepositoryTest extends FunSuite with BankInfoRepositoryLike with P
 
   test("Get bank info list") {
     val bankInfoOne: BankInfo = findAll.head
-    val desired: List[BankInfo] = List(BankInfo("Government", branches=10000, bankId=bankOne.idAsInt, bankInfoOne.id))
     whenReady(findAllAsync) { bankInfos =>
       assert(bankInfos.nonEmpty)
     }
