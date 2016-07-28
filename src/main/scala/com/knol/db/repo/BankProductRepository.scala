@@ -35,10 +35,6 @@ private[repo] trait BankProductRepositoryLike extends BankProductTable { this: D
   @inline def deleteAllAsync(): Future[Int] = db.run { tableQuery.delete }
   @inline def deleteAll(): Int = Await.result(deleteAllAsync(), Duration.Inf)
 
-  @inline def updateAsync(bankProduct: BankProduct): Future[Int] =
-    db.run { tableQuery.filter(_.id === bankProduct.id.get).update(bankProduct) }
-  @inline def update(bankProduct: BankProduct): Int = Await.result(updateAsync(bankProduct), Duration.Inf)
-
   @inline def getByIdAsync(id: Int): Future[Option[BankProduct]] =
     db.run { tableQuery.filter(_.id === id).result.headOption }
   @inline def getById(id: Int): Option[BankProduct] = Await.result(getByIdAsync(id), Duration.Inf)
@@ -66,6 +62,14 @@ private[repo] trait BankProductRepositoryLike extends BankProductTable { this: D
 
   @inline def getAllBankWithProduct: List[(Bank, Option[BankProduct])] =
     Await.result(getAllBankWithProductAsync, Duration.Inf)
+
+  @inline def updateAsync(bankProduct: BankProduct): Future[Int] =
+    db.run { tableQuery.filter(_.id === bankProduct.id.get).update(bankProduct) }
+  @inline def update(bankProduct: BankProduct): Int = Await.result(updateAsync(bankProduct), Duration.Inf)
+
+  @inline def upsertAsync(bankProduct: BankProduct): Future[Int] =
+    db.run { tableQuery.filter(_.id === bankProduct.id.get).insertOrUpdate(bankProduct) }
+  @inline def upsert(bankProduct: BankProduct): Int = Await.result(upsertAsync(bankProduct), Duration.Inf)
 }
 
 object BankProductRepository extends BankProductRepositoryLike with SelectedDB

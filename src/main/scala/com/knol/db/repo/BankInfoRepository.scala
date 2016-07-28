@@ -31,10 +31,6 @@ protected[repo] trait BankInfoTable extends BankTable { this: DBComponent =>
 protected[repo] trait BankInfoRepositoryLike extends BankInfoTable with HasIdActionLike[BankInfo] { this: DBComponent =>
   import driver.api._ // defines DBIOAction and other important bits
 
-  @inline def updateAsync(bankInfo: BankInfo): Future[Int] =
-    runAsync { tableQuery.filter(_.id === bankInfo.id.get).update(bankInfo) }
-  @inline def update(bankInfo: BankInfo): Int = Await.result(updateAsync(bankInfo), Duration.Inf)
-
   @inline def createAsync(bankInfo: BankInfo): Future[Int] = runAsync { autoInc += bankInfo }
   @inline def create(bankInfo: BankInfo): Int = Await.result(createAsync(bankInfo), Duration.Inf)
 
@@ -54,6 +50,14 @@ protected[repo] trait BankInfoRepositoryLike extends BankInfoTable with HasIdAct
       bankTableQuery.joinLeft(tableQuery).on(_.id === _.bankId).to[List].result
     }
   @inline def getAllBankWithInfo: List[(Bank, Option[BankInfo])] = Await.result(getAllBankWithInfoAsync, Duration.Inf)
+
+  @inline def updateAsync(bankInfo: BankInfo): Future[Int] =
+    runAsync { tableQuery.filter(_.id === bankInfo.id.get).update(bankInfo) }
+  @inline def update(bankInfo: BankInfo): Int = Await.result(updateAsync(bankInfo), Duration.Inf)
+
+  @inline def upsertAsync(bankInfo: BankInfo): Future[Int] =
+    db.run { tableQuery.filter(_.id === bankInfo.id.get).insertOrUpdate(bankInfo) }
+  @inline def upsert(bankInfo: BankInfo): Int = Await.result(upsertAsync(bankInfo), Duration.Inf)
 }
 
 object BankInfoRepository extends BankInfoRepositoryLike with SelectedDB

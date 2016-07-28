@@ -19,7 +19,7 @@ protected[repo] trait BankTable { this: DBComponent =>
 
   val bankTableQuery = TableQuery[BankTable]
 
-  def bankTableAutoInc = bankTableQuery returning bankTableQuery.map(_.id)
+  def bankTableAutoInc = bankTableQuery returning bankTableQuery.map(_.id)// into copyUpdate
 }
 
 protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =>
@@ -38,10 +38,6 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
   @inline def deleteAllAsync(): Future[Int] = db.run { bankTableQuery.delete }
   @inline def deleteAll(): Int = Await.result(deleteAllAsync(), Duration.Inf)
 
-  /** update existing bank */
-  @inline def updateAsync(bank: Bank): Future[Int] = db.run { bankTableQuery.filter(_.id === bank.id.get).update(bank) }
-  @inline def update(bank: Bank): Int = Await.result(updateAsync(bank), Duration.Inf)
-
   /** Get bank by id */
   @inline def getByIdAsync(id: Int): Future[Option[Bank]] =
     db.run { bankTableQuery.filter(_.id === id).result.headOption }
@@ -54,6 +50,14 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
   /** delete bank by id */
   @inline def deleteAsync(id: Int): Future[Int] = db.run { bankTableQuery.filter(_.id === id).delete }
   @inline def delete(id: Int): Int = Await.result(deleteAsync(id), Duration.Inf)
+
+  /** update existing bank */
+  @inline def updateAsync(bank: Bank): Future[Int] = db.run { bankTableQuery.filter(_.id === bank.id.get).update(bank) }
+  @inline def update(bank: Bank): Int = Await.result(updateAsync(bank), Duration.Inf)
+
+  @inline def upsertAsync(bank: Bank): Future[Int] =
+    db.run { bankTableQuery.filter(_.id === bank.id.get).insertOrUpdate(bank) }
+  @inline def upsert(bank: Bank): Int = Await.result(upsertAsync(bank), Duration.Inf)
 }
 
 object BankRepository extends BankRepositoryLike with SelectedDB {

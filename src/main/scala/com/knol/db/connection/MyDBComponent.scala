@@ -1,12 +1,11 @@
 package com.knol.db
 
-import com.knol.db.connection.DBComponent
-
 package connection {
   object DBComponent {
     import concurrent.duration._
     import scala.language.postfixOps
 
+    val Logger = org.slf4j.LoggerFactory.getLogger("persistence")
     val dbDuration: FiniteDuration = 1 minute
   }
 
@@ -26,7 +25,11 @@ package connection {
       Await.result(runAsync(action), dbDuration)
 
     /** Independent of schema, just dependent on Database */
-    @inline def runAsync[R](action: DBIOAction[R, NoStream, Nothing]): Future[R] = db.run(action)
+    @inline def runAsync[R](action: DBIOAction[R, NoStream, Nothing]): Future[R] =
+      db.run(action) andThen {
+        case scala.util.Failure(ex) =>
+          DBComponent.Logger.error(s"DBComponent.runAsync: ${ ex.getCause }: ${ ex.getMessage }")
+      }
   }
 
   trait MySqlDBComponent extends DBComponent {
