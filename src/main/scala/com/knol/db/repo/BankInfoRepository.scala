@@ -7,6 +7,8 @@ import scala.concurrent.duration.Duration
 
 case class BankInfo(owner: String, branches: Int, bankId: Int, override val id: Option[Int] = None) extends HasId {
   override def toString = s"""BankInfo for $owner; bankId #$bankId; $branches branches."""
+
+  def idAsInt = id.getOrElse(0)
 }
 
 protected[repo] trait BankInfoTable extends BankTable { this: DBComponent =>

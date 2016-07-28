@@ -1,5 +1,6 @@
 package com.knol.db.connection
 
+// NOT USED: H2 allows only a single AutoInc column to be returned from an INSERT.
 trait H2DBComponent extends DBComponent {
   val driver = slick.driver.H2Driver
   import driver.api._

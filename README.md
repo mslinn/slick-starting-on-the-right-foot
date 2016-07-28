@@ -3,7 +3,7 @@
 This is an sample project for showcasing best practices and providing a seed for starting with Slick 3.1.1.
 Adapted from the [Knoldus project](https://github.com/knoldus/slick-starting-on-the-right-foot).
 
-## Clone Project:
+## Clone Project
 
 ```
 $ git clone git@github.com:mslinn/slick-starting-on-the-right-foot.git
@@ -15,7 +15,9 @@ $ sbt clean compile
 
 Unit tests have use the H2 database. If you want run the demo app you need to create a database in Postgres or MySQL.
 
-### For Postgres, run psql, then:
+### Postgres
+
+For Postgres, run `psql`, then:
 
 ````
 CREATE DATABASE bank_db;
@@ -24,7 +26,8 @@ use bank_db;
 ````
 See postgresSchema.sql for the DDL to create the tables.
 
-### For MySQL, run mysql, then:
+### MySQL
+For MySQL, run `mysql`, then:
 
 ```
 create database bank_db;
@@ -33,7 +36,7 @@ use bank_db;
 
 See mysqlSchema.sql for the DDL to create the tables. This file is also used for unit tests.
 
-### Run the app:
+### Running the app
 
 ```
 $ sbt run
@@ -42,3 +45,7 @@ info] Running com.knol.db.Demo
 List((Bank(ICICI bank,Some(1)),Some(BankInfo(Government,1000,1,Some(1)))), (Bank(SBI Bank,Some(2)),None))
 List((Bank(ICICI bank,Some(1)),Some(BankProduct(Car loan,1,Some(1)))), (Bank(SBI Bank,Some(2)),None))
 ```
+
+### Tests
+
+The H2 database does not work with this project because it "allows only a single AutoInc column to be returned from an INSERT".

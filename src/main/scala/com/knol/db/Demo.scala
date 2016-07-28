@@ -9,9 +9,9 @@ object Misc {
 object Demo extends App {
   val newBank: Bank = BankRepository.create(Bank("ICICI bank"))
   (1 to 99).indices.foreach { i =>
-    BankProductRepository.create(BankProduct(s"Car loan $i", bankId=newBank.idAsInt))
-    BankInfoRepository.create(BankInfo(s"Government $i", 1000+i, bankId=newBank.idAsInt))
-    BankRepository.create(Bank(s"SBI Bank $i"))
+    BankProductRepository.upsert(BankProduct(s"Car loan $i", bankId=newBank.idAsInt))
+    BankInfoRepository.upsert(BankInfo(s"Government $i", 1000+i, bankId=newBank.idAsInt))
+    BankRepository.upsert(Bank(s"SBI Bank $i"))
   }
 
   BankInfoRepository.getAllBankWithInfo.foreach {

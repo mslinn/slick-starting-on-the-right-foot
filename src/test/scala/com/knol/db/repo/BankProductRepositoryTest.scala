@@ -1,59 +1,48 @@
 package com.knol.db.repo
 
-import com.knol.db.connection.H2DBComponent
+import com.knol.db.connection.{H2DBComponent, PostgresDBComponent}
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 
-class BankProductRepositoryTest extends FunSuite with BankProductRepositoryLike with H2DBComponent with ScalaFutures {
+class BankProductRepositoryTest extends FunSuite with BankProductRepositoryLike with PostgresDBComponent with ScalaFutures {
   implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 
+  val bankOne: Bank = BankRepository.getAll.head
+
   test("Add new Product ") {
-    whenReady(createAsync(BankProduct("car loan", 1))) { productId =>
-      assert(productId === 3)
+    whenReady(createAsync(BankProduct("car loan", bankId=bankOne.idAsInt))) { product =>
+      assert(product.id.nonEmpty)
     }
   }
 
   test("Update bank product ") {
-    whenReady(updateAsync(BankProduct("Home Loan", 1, Some(1)))) { response =>
-      assert(response === 1)
+    val bankProductOne: BankProduct = getAll.head
+    whenReady(updateAsync(bankProductOne.copy(name="Monster Loan"))) { count =>
+      assert(count === 1)
     }
   }
 
   test("Delete bank info") {
-    whenReady(deleteAsync(1)) { response =>
-      assert(response === 1)
-    }
+    val bankProductOne: BankProduct = getAll.head
+    assert(bankProductOne.id.map(delete).sum === 1)
   }
 
   test("Get product list") {
-    val desired = List(
-      BankProduct("Home loan", 1, Some(1)),
-      BankProduct("Eduction loan", 1, Some(2))
-    )
     whenReady(getAllAsync) { products =>
-      assert(products === desired)
+      assert(products.nonEmpty)
     }
   }
 
   test("Get bank and their product list") {
-    val desired = List(
-      (Bank("SBI bank", Some(1)), BankProduct("Home loan", 1, Some(1))),
-      (Bank("SBI bank", Some(1)), BankProduct("Eduction loan", 1, Some(2)))
-    )
     whenReady(getBankWithProductAsync) { bankProduct =>
-      assert(bankProduct === desired)
+      assert(bankProduct.nonEmpty)
     }
   }
 
-  test("Get all bank and  product list") {
-    val desired = List(
-      (Bank("SBI bank", Some(1)), Some(BankProduct("Home loan", 1, Some(1)))),
-      (Bank("SBI bank", Some(1)), Some(BankProduct("Eduction loan", 1, Some(2)))),
-      (Bank("PNB bank", Some(2)), None)
-    )
+  test("Get all bank and product list") {
     whenReady(getAllBankWithProductAsync) { bankProduct =>
-      assert(bankProduct === desired)
+      assert(bankProduct.nonEmpty)
     }
   }
 }

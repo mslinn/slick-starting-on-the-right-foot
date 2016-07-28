@@ -1,56 +1,51 @@
 package com.knol.db.repo
 
-import com.knol.db.connection.H2DBComponent
+import com.knol.db.connection.{H2DBComponent, PostgresDBComponent}
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
-import scala.concurrent.Future
 
-class BankInfoRepositoryTest extends FunSuite with BankInfoRepositoryLike with H2DBComponent with ScalaFutures {
+class BankInfoRepositoryTest extends FunSuite with BankInfoRepositoryLike with PostgresDBComponent with ScalaFutures {
   implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
+  val bankOne: Bank = BankRepository.getAll.head
 
   test("Add new bank info") {
-    whenReady(createAsync(BankInfo("Government", 1000, 1))) { bankInfoId =>
-      assert(bankInfoId === 2)
+    whenReady(createAsync(BankInfo("Government", branches=1000, bankId=bankOne.idAsInt))) { bankInfo =>
+      assert(bankInfo.id.nonEmpty)
     }
   }
 
-  test("Update  bank info ") {
-    whenReady(updateAsync(BankInfo("Government", 18989, 1, Some(1)))) { updatedRowCount =>
+  test("Update bank info") {
+    val bankInfoOne: BankInfo = findAll.head
+    whenReady(updateAsync(BankInfo("Government", branches=18989, bankId=bankOne.idAsInt, id=bankInfoOne.id))) { updatedRowCount =>
       assert(updatedRowCount === 1)
     }
   }
 
-  test("Delete  bank info  ") {
-    whenReady(deleteAsync(1)) { deletedRowCount =>
+  test("Delete bank info") {
+    val bankInfoOne: BankInfo = findAll.head
+    whenReady(deleteAsync(bankInfoOne.idAsInt)) { deletedRowCount =>
       assert(deletedRowCount === 1)
     }
   }
 
   test("Get bank info list") {
-    val desired: List[BankInfo] = List(BankInfo("Government", 10000, 1, Some(1)))
+    val bankInfoOne: BankInfo = findAll.head
+    val desired: List[BankInfo] = List(BankInfo("Government", branches=10000, bankId=bankOne.idAsInt, bankInfoOne.id))
     whenReady(findAllAsync) { bankInfos =>
-      assert(bankInfos === desired)
+      assert(bankInfos.nonEmpty)
     }
   }
 
   test("Get bank and their info list") {
-    val desired = List(
-      (Bank("SBI bank", Some(1)), BankInfo("Government", 10000, 1, Some(1)))
-    )
-    val bankInfo = getBankWithInfoAsync
-    whenReady(bankInfo) { result =>
-      assert(result === desired)
+    whenReady(getBankWithInfoAsync) { result =>
+      assert(result.nonEmpty)
     }
   }
 
-  test("Get all bank and  info list") {
-    val desired = List(
-      (Bank("SBI bank", Some(1)), Some(BankInfo("Government", 10000, 1, Some(1)))),
-      (Bank("PNB bank", Some(2)), None)
-    )
+  test("Get all bank and info list") {
     whenReady(getAllBankWithInfoAsync) { bankInfos =>
-      assert(bankInfos === desired)
+      assert(bankInfos.nonEmpty)
     }
   }
 }
