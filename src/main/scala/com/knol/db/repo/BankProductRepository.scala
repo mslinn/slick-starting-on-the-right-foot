@@ -84,10 +84,7 @@ private[repo] trait BankProductRepositoryLike extends BankProductTable { this: D
     Await.result(upsertAsync(bankProduct), Duration.Inf)
 
   @inline def upsertAsync(bankProduct: BankProduct)(implicit ec: ExecutionContext): Future[BankProduct] =
-    db.run { autoInc.insertOrUpdate(bankProduct) }.transform(
-      _.getOrElse(bankProduct),
-      failure => failure
-    )
+    db.run { autoInc.insertOrUpdate(bankProduct) }.transform(_.getOrElse(bankProduct), identity)
 }
 
 object BankProductRepository extends BankProductRepositoryLike with SelectedDB

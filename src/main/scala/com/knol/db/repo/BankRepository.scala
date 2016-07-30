@@ -60,10 +60,7 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
 
 
   @inline def upsertAsync(bank: Bank)(implicit ec: ExecutionContext): Future[Bank] =
-    db.run { bankTableAutoInc.insertOrUpdate(bank) }.transform(
-      _.getOrElse(bank),
-      failure => failure
-    )
+    db.run { bankTableAutoInc.insertOrUpdate(bank) }.transform(_.getOrElse(bank), identity)
 
   @inline def upsert(bank: Bank)(implicit ec: ExecutionContext): Bank =
     Await.result(upsertAsync(bank), Duration.Inf)

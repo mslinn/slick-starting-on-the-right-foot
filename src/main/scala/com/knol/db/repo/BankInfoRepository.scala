@@ -69,10 +69,7 @@ protected[repo] trait BankInfoRepositoryLike extends BankInfoTable with HasIdAct
     Await.result(upsertAsync(bankInfo), Duration.Inf)
 
   @inline def upsertAsync(bankInfo: BankInfo)(implicit ec: ExecutionContext): Future[BankInfo] =
-    db.run { autoInc.insertOrUpdate(bankInfo) }.transform(
-      _.getOrElse(bankInfo),
-      failure => failure
-    )
+    db.run { autoInc.insertOrUpdate(bankInfo) }.transform(_.getOrElse(bankInfo), identity)
 }
 
 object BankInfoRepository extends BankInfoRepositoryLike with SelectedDB
