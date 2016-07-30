@@ -1,9 +1,10 @@
 package com.knol.db.repo
 
 import org.scalatest.FunSuite
-import com.knol.db.connection.{H2DBComponent, PostgresDBComponent}
+import com.knol.db.connection.PostgresDBComponent
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class BankRepositoryTest extends FunSuite with BankRepositoryLike with PostgresDBComponent with ScalaFutures {
   implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
@@ -29,18 +30,18 @@ class BankRepositoryTest extends FunSuite with BankRepositoryLike with PostgresD
   test("Upsert existing bank") {
     val bankOne: Bank = getAll.head
     whenReady(upsertAsync(bankOne)) { bank => // why is bank==None?
-      assert(bank.exists(_.idAsInt >= 0))
+      assert(bank.idAsInt >= 0)
     }
 
     val modifiedBank = bankOne.copy(name="Beyondanana")
     whenReady(upsertAsync(modifiedBank)) { bank => // why is bank==None?
-      assert(bank.exists(_.idAsInt >= 0))
+      assert(bank.idAsInt >= 0)
     }
   }
 
   test("Upsert new bank") {
     whenReady(upsertAsync(Bank("ICICI bank"))) { bank =>
-      assert(bank.exists(_.idAsInt >= 0))
+      assert(bank.idAsInt >= 0)
     }
   }
 

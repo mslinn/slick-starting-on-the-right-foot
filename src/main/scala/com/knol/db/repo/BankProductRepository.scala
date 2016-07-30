@@ -2,7 +2,8 @@ package com.knol.db.repo
 
 import com.knol.db.Misc.Logger
 import com.knol.db.connection.{DBComponent, SelectedDB}
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 case class BankProduct(name: String, bankId: Int, id: Option[Int] = None) {
   override def toString = s"Product $name #$bankId"
@@ -79,20 +80,14 @@ private[repo] trait BankProductRepositoryLike extends BankProductTable { this: D
     db.run { tableQuery.filter(_.id === bankProduct.id.get).update(bankProduct) }
 
 
-  @inline def upsert(bankProduct: BankProduct): Option[BankProduct] =
+  @inline def upsert(bankProduct: BankProduct)(implicit ec: ExecutionContext): BankProduct =
     Await.result(upsertAsync(bankProduct), Duration.Inf)
 
-  @inline def upsertAsync(bankProduct: BankProduct): Future[Option[BankProduct]] =
-    db.run { autoInc.insertOrUpdate(bankProduct) }
-
-  @inline def upsertOrDie(bankProduct: BankProduct): BankProduct =
-      try {
-        upsert(bankProduct).get
-      } catch {
-        case ex: Exception =>
-          Logger.error(s"Could not upsert $bankProduct; ${ ex.getMessage }: ${ ex.getCause }")
-          throw ex
-      }
+  @inline def upsertAsync(bankProduct: BankProduct)(implicit ec: ExecutionContext): Future[BankProduct] =
+    db.run { autoInc.insertOrUpdate(bankProduct) }.transform(
+      _.getOrElse(bankProduct),
+      failure => failure
+    )
 }
 
 object BankProductRepository extends BankProductRepositoryLike with SelectedDB

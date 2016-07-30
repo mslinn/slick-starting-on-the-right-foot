@@ -1,6 +1,7 @@
 package com.knol.db
 
 import com.knol.db.repo._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Misc {
   val Logger = org.slf4j.LoggerFactory.getLogger("demo")

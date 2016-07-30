@@ -2,7 +2,7 @@ package com.knol.db.repo
 
 import com.knol.db.Misc.Logger
 import com.knol.db.connection._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class Bank(name: String, id: Option[Int] = None) {
   override def toString = s"""Bank $name ${ id.map(x => s"id #$x").mkString }"""
@@ -58,17 +58,15 @@ protected[repo] trait BankRepositoryLike extends BankTable { this: DBComponent =
   @inline def updateAsync(bank: Bank): Future[Int] = db.run { bankTableQuery.filter(_.id === bank.id.get).update(bank) }
   @inline def update(bank: Bank): Int = Await.result(updateAsync(bank), Duration.Inf)
 
-  @inline def upsertAsync(bank: Bank): Future[Option[Bank]] =
-    db.run { bankTableAutoInc.insertOrUpdate(bank) }
-  @inline def upsert(bank: Bank): Option[Bank] = Await.result(upsertAsync(bank), Duration.Inf)
-  @inline def upsertOrDie(bank: Bank): Bank =
-    try {
-      upsert(bank).get
-    } catch {
-      case ex: Exception =>
-        Logger.error(s"Could not upsert $bank; ${ ex.getMessage }: ${ ex.getCause }")
-        throw ex
-    }
+
+  @inline def upsertAsync(bank: Bank)(implicit ec: ExecutionContext): Future[Bank] =
+    db.run { bankTableAutoInc.insertOrUpdate(bank) }.transform(
+      _.getOrElse(bank),
+      failure => failure
+    )
+
+  @inline def upsert(bank: Bank)(implicit ec: ExecutionContext): Bank =
+    Await.result(upsertAsync(bank), Duration.Inf)
 }
 
 object BankRepository extends BankRepositoryLike with SelectedDB {
